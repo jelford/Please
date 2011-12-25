@@ -36,5 +36,6 @@ public class InvokePrivate extends TestCase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 }

@@ -1,11 +1,16 @@
 package test;
 
-import junit.framework.TestCase;
 import generated.Please;
 import generated.Interface.src.ClassToMockPrivate;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import junit.framework.TestCase;
+
 import org.junit.Test;
 
+import src.ASecondClass;
 import src.ClassToMock;
 
 public class GenTest extends TestCase {
@@ -24,5 +29,12 @@ public class GenTest extends TestCase {
 		
 		ClassToMock ctm = new ClassToMock();
 		assertEquals(Integer.valueOf(5), please.Call(ctm).someOtherStuff(1, 4));
+	}
+	
+	@Test
+	public void testCanHandleVoidReturn() {
+		Please please = new Please();
+		ASecondClass asc = new ASecondClass();
+		please.Call(asc).someFunction(asc);
 	}
 }

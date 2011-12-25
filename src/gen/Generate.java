@@ -87,6 +87,9 @@ public class Generate {
 				CtMethod[] ctmMethods = ctm.getDeclaredMethods();
 				for (CtMethod method : ctmMethods) {
 					String name = method.getName();
+					boolean hasReturn = !method.getReturnType().getName().equals("void");
+					boolean isPrimitive = method.getReturnType().isPrimitive();
+					
 					MethodInfo info = method.getMethodInfo();
 					int accessFlags = info.getAccessFlags();
 					if (AccessFlag.isPrivate(accessFlags)) {
@@ -102,6 +105,7 @@ public class Generate {
 						mBody.append(
 						"{" +
 							"try {"+
+								// Get a hold on the method
 								"java.lang.reflect.Method m = wrapped.getClass().getDeclaredMethod(\""+method.getName()+"\", ");
 										if (method.getParameterTypes().length > 0) {
 											mBody.append("new Class[] {");
@@ -115,18 +119,28 @@ public class Generate {
 											mBody.append("null");
 										}
 								mBody.append(
-										");"+
-								"m.setAccessible(true);" + 
-								"return (("+method.getReturnType().getName()+") m.invoke(wrapped, new Object[] {");
-										for (int i=0; i < method.getParameterTypes().length; ++i) {
-											mBody.append("$"+(Integer.toString(i+1))+", ");
-										}
-										mBody.replace(mBody.length()-2, mBody.length(), "");
-					
-									mBody.append("}));" +
+										");");
+								
+								// Expose the method
+								mBody.append("m.setAccessible(true);"); 
+								
+								// Cast for return
+								if (hasReturn) {
+									mBody.append("return ("+method.getReturnType().getName()+") ");
+								}
+								
+								// Invoke the method
+								mBody.append("m.invoke(wrapped, new Object[] {");
+								for (int i=0; i < method.getParameterTypes().length; ++i) {
+									mBody.append("$"+(Integer.toString(i+1))+", ");
+								}
+								mBody.replace(mBody.length()-2, mBody.length(), "");
+			
+								mBody.append("});");
 								
 								
-								
+							// Exception handling
+							mBody.append(	
 							"} catch (SecurityException e) {" +
 								"e.printStackTrace();" +
 							"} catch (NoSuchMethodException e) {" +
@@ -138,21 +152,19 @@ public class Generate {
 							"} catch (java.lang.reflect.InvocationTargetException e) {" +
 								"e.printStackTrace();" +
 							"}" + 
-							"return null;" +
+							(hasReturn ? "return null;" : "") +
 							
 						"}");
 						
-						
-						
 						System.out.println(mBody);
+							
+							
 						CtMethod wrappedPrivateMethod = CtNewMethod.make(
 								method.getReturnType(), name,
 								method.getParameterTypes(),
 								method.getExceptionTypes(), mBody.toString(),
 								privateAccessImpl);	
 
-						System.out.println(wrappedPrivateMethod.getReturnType().toString());
-						
 						privateAccessImpl.addMethod(wrappedPrivateMethod);
 					}
 				}
