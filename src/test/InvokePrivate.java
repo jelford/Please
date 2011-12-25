@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import src.ClassToMock;
+import test.candidates.ClassToMock;
 
 public class InvokePrivate extends TestCase {
 	@Test

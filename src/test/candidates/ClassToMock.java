@@ -1,6 +1,6 @@
-package src;
+package test.candidates;
 
-import gen.Expose;
+import src.elford.james.please.Expose;
 
 @Expose
 public class ClassToMock {

@@ -1,13 +1,13 @@
 package test;
 
 import gen.elford.james.please.Please;
-import gen.elford.james.please.Interface.src.ClassToMockPrivate;
+import gen.elford.james.please.Interface.test.candidates.ClassToMockPrivate;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import src.ASecondClass;
-import src.ClassToMock;
+import test.candidates.ASecondClass;
+import test.candidates.ClassToMock;
 
 public class GenTest extends TestCase {
 

@@ -1,8 +1,6 @@
-package src;
+package test.candidates;
 
-import gen.Expose;
-
-import java.io.PrintStream;
+import src.elford.james.please.Expose;
 
 @Expose
 public class ASecondClass {

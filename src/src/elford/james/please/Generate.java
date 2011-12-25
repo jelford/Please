@@ -1,4 +1,4 @@
-package gen;
+package src.elford.james.please;
 
 import java.io.IOException;
 
