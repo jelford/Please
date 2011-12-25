@@ -32,6 +32,16 @@ public class Generate {
 		Discoverer disco = new ClasspathDiscoverer();
 		disco.addAnnotationListener(new ExposeAnnotationDiscoveryListener(cp, please));
 		disco.discover();
+		
+		try {
+			please.writeFile("gen");
+		} catch (CannotCompileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -155,7 +165,6 @@ public class Generate {
 
 				privateAccess.writeFile("gen");
 				privateAccessImpl.writeFile("gen");
-				please.writeFile("gen");
 			} catch (NotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
