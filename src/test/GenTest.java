@@ -1,11 +1,7 @@
 package test;
 
-import generated.Please;
-import generated.Interface.src.ClassToMockPrivate;
-
-import java.io.OutputStream;
-import java.io.PrintStream;
-
+import gen.elford.james.please.Please;
+import gen.elford.james.please.Interface.src.ClassToMockPrivate;
 import junit.framework.TestCase;
 
 import org.junit.Test;

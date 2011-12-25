@@ -24,10 +24,8 @@ public class Generate {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("Hello world");
-
 		ClassPool cp = ClassPool.getDefault();
-		CtClass please = cp.makeClass("generated.Please");
+		CtClass please = cp.makeClass("gen.elford.james.please.Please");
 
 		Discoverer disco = new ClasspathDiscoverer();
 		disco.addAnnotationListener(new ExposeAnnotationDiscoveryListener(cp, please));
@@ -70,9 +68,9 @@ public class Generate {
 
 				CtClass ctm = cp.get(clazz);
 				CtClass privateAccess = cp
-						.makeInterface("generated.Interface." + clazz + "Private");
+						.makeInterface("gen.elford.james.please.Interface." + clazz + "Private");
 				CtClass privateAccessImpl = cp
-						.makeClass("generated." + clazz + "PrivateImpl");
+						.makeClass("gen.elford.james.please.Implementation." + clazz + "PrivateImpl");
 				
 				CtField wrapped = new CtField(ctm, "wrapped", privateAccessImpl);
 				privateAccessImpl.addField(wrapped);
