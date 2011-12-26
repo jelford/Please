@@ -63,6 +63,7 @@ public class Generate {
 		private final String endFunctionBody = "}";
 		private final String setMethodAccessible = "m.setAccessible(true);";
 		private final String methodName = "m";
+		private final String wrappedMethodField = "wrapped";
 		
 		
 		public ExposeAnnotationDiscoveryListener(ClassPool cp, CtClass please, PrintStream out) {

@@ -14,4 +14,8 @@ public class ClassToMock {
 	private Integer someOtherStuff(Integer a, Integer b) {
 		return Integer.valueOf(a.intValue() + b.intValue());
 	}
+	
+	private Integer add(Integer a, Integer b) {
+		return Integer.valueOf(a.intValue() + b.intValue());
+	}
 }
