@@ -6,20 +6,23 @@ import java.lang.reflect.Method;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
-import test.candidates.ClassToMock;
+import test.candidates.PrimitiveReturnTypes;
 
 public class InvokePrivate extends TestCase {
 	@Test
 	public void testCanInvokePrivateMethods() {
-		ClassToMock ctm = new ClassToMock();
+		PrimitiveReturnTypes ctm = new PrimitiveReturnTypes();
+		byte ret = 1;
 		try {
-			Method m = ctm.getClass().getDeclaredMethod("doStuff", new Class[] {Boolean.class});
+			Method m = ctm.getClass()
+					.getDeclaredMethod("buyte", new Class[] {});
 			m.setAccessible(true);
-			assertTrue((Boolean) m.invoke(ctm, new Object[] {Boolean.valueOf(true)}));
-			
-			
-			
+			assertThat((byte) (Byte) m.invoke(ctm, new Object[] {}),
+					is(equalTo(ret)));
+
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -36,6 +39,6 @@ public class InvokePrivate extends TestCase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 }

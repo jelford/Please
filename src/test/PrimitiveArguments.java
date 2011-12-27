@@ -6,79 +6,79 @@ import gen.elford.james.please.PleaseInterface;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
-public class PrimitiveReturnTypes {
+public class PrimitiveArguments {
 	private PleaseInterface please;
-	private test.candidates.PrimitiveReturnTypes cut;
+	private test.candidates.PrimitiveArguments cut;
 	
 	@Before
 	public void setUp() {
 		this.please = new Please();
-		this.cut = new test.candidates.PrimitiveReturnTypes();
+		cut = new test.candidates.PrimitiveArguments();
 	}
 	
 	@After
 	public void tearDown() {
 		this.please = null;
-		this.cut = null;
+		cut = null;
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveByte() {
-		byte ret = please.call(cut).buyte();
 		byte expected = 1;
+		byte ret = please.call(cut).buyte(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
-
+	
 	@Test
 	public void testCanHandlePrimitiveShort() {
-		short ret = please.call(cut).suret();
 		short expected = 1;
+		short ret = please.call(cut).suret(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveInt() {
-		int ret = please.call(cut).innt();
 		int expected = 1;
+		int ret = please.call(cut).innt(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveLong() {
-		long ret = please.call(cut).lorng();
 		long expected = 1;
+		long ret = please.call(cut).lorng(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveFloat() {
-		float ret = please.call(cut).flote();
 		float expected = 1.0f;
+		float ret = please.call(cut).flote(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveDouble() {
-		double ret = please.call(cut).dubul();
 		double expected = 1.0;
+		double ret = please.call(cut).dubul(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveBoolean() {
-		boolean ret = please.call(cut).booleighan();
 		boolean expected = true;
+		boolean ret = please.call(cut).booleighan(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
 	
 	@Test
 	public void testCanHandlePrimitiveChar() {
-		char ret = please.call(cut).charr();
-		char expected = 'a';
+		char expected = 'b';
+		char ret = please.call(cut).charr(expected);
 		assertThat(ret, is(equalTo(expected)));
 	}
-
 }
