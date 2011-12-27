@@ -21,9 +21,9 @@ import com.impetus.annovention.listener.ClassAnnotationDiscoveryListener;
 public class Generate {
 	public static void main(String[] args) throws Exception {
 		ClassPool cp = ClassPool.getDefault();
-		CtClass please = cp.makeClass("gen.elford.james.please.Please");
+		CtClass please = cp.makeClass(Config.pleaseImplementationClass);
 		CtClass pleaseInterface = cp
-				.makeInterface("gen.elford.james.please.PleaseInterface");
+				.makeInterface(Config.pleaseInterfaceClass);
 
 		Discoverer disco = new ClasspathDiscoverer();
 		Generate gen = new Generate(cp, please, pleaseInterface, System.out);
@@ -32,8 +32,8 @@ public class Generate {
 		disco.discover();
 
 		please.addInterface(pleaseInterface);
-		please.writeFile("gen");
-		pleaseInterface.writeFile("gen");
+		please.writeFile(Config.destination);
+		pleaseInterface.writeFile(Config.destination);
 	}
 
 	static class ExposeAnnotationDiscoveryListener implements
@@ -79,11 +79,9 @@ public class Generate {
 
 			CtClass ctm = cp.get(clazz);
 			CtClass privateAccess = cp
-					.makeInterface("gen.elford.james.please.Interface." + clazz
-							+ "Private");
+					.makeInterface(Config.interfaceQualifiedNameFor(clazz));
 			CtClass privateAccessImpl = cp
-					.makeClass("gen.elford.james.please.Implementation."
-							+ clazz + "PrivateImpl");
+					.makeClass(Config.implementationQualifiedNameFor(clazz));
 
 			CtField wrapped = new CtField(ctm, wrappedMethodField,
 					privateAccessImpl);
@@ -163,8 +161,8 @@ public class Generate {
 					"call", new CtClass[] { ctm }, new CtClass[0],
 					pleaseInterface));
 
-			privateAccess.writeFile("gen");
-			privateAccessImpl.writeFile("gen");
+			privateAccess.writeFile(Config.destination);
+			privateAccessImpl.writeFile(Config.destination);
 		} catch (Exception e) {
 			throw new Error(e);
 		}
@@ -173,13 +171,9 @@ public class Generate {
 	private final String startFunctionBody = "{";
 	private final String startTryBlock = "try {";
 
-	private final String endTryBlock = "} catch (SecurityException e) {"
-			+ "e.printStackTrace();" + "} catch (NoSuchMethodException e) {"
-			+ "e.printStackTrace();" + "} catch (IllegalArgumentException e) {"
-			+ "e.printStackTrace();" + "} catch (IllegalAccessException e) {"
-			+ "e.printStackTrace();"
-			+ "} catch (java.lang.reflect.InvocationTargetException e) {"
-			+ "e.printStackTrace();" + "}";
+	// If an error arrises in the introspection, we might as well just throw it;
+	// there's no sensible error handling we could do anyway.
+	private final String endTryBlock = "} catch (Exception e) { throw new Error(e); } ";
 
 	private final String endFunctionBody = "}";
 	private final String setMethodAccessible = "m.setAccessible(true);";

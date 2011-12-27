@@ -2,7 +2,7 @@ package test;
 
 import gen.elford.james.please.Please;
 import gen.elford.james.please.PleaseInterface;
-import gen.elford.james.please.Interface.test.candidates.ClassToMockPrivate;
+import gen.elford.james.please.interfaces.test.candidates.ClassToMockPrivate;
 import junit.framework.TestCase;
 
 import org.junit.After;
