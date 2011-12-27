@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 import test.candidates.ASecondClass;
 import test.candidates.ClassToMock;
@@ -36,6 +38,12 @@ public class GenTest extends TestCase {
 	public void testWithTwoArguments() {
 		ClassToMock ctm = new ClassToMock();
 		assertEquals(Integer.valueOf(5), please.call(ctm).someOtherStuff(1, 4));
+	}
+	
+	@Test
+	public void testadditionOnClassToMock() {
+		ClassToMock ctm = new ClassToMock();
+		assertThat(please.call(ctm).add(5, 4), is(equalTo(9)));
 	}
 	
 	@Test

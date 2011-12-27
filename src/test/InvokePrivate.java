@@ -1,13 +1,14 @@
 package test;
 
-import java.lang.reflect.InvocationTargetException;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.lang.reflect.Method;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 import test.candidates.PrimitiveReturnTypes;
 
@@ -23,21 +24,8 @@ public class InvokePrivate extends TestCase {
 			assertThat((byte) (Byte) m.invoke(ctm, new Object[] {}),
 					is(equalTo(ret)));
 
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new Error(e);
 		}
 
 	}
