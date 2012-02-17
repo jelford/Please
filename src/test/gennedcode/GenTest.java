@@ -1,4 +1,4 @@
-package test;
+package test.gennedcode;
 
 import gen.elford.james.please.Please;
 import gen.elford.james.please.PleaseInterface;
@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import test.candidates.ASecondClass;
 import test.candidates.ClassToMock;
+import tests.ConcreteInvokable;
 
 public class GenTest extends TestCase {
 	private PleaseInterface please;

@@ -1,7 +1,7 @@
 package test.candidates;
 
 import src.elford.james.please.Expose;
-import test.Invokable;
+import tests.Invokable;
 
 @Expose
 public class ASecondClass {

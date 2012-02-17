@@ -1,4 +1,4 @@
-package test;
+package test.gennedcode;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;

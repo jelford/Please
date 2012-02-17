@@ -1,4 +1,4 @@
-package test;
+package tests;
 
 public class ConcreteInvokable implements Invokable {
 	private boolean called = false;

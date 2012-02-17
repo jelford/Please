@@ -1,4 +1,4 @@
-package test;
+package tests;
 
 public interface Invokable {
 	public void invoke();
