@@ -1,10 +1,21 @@
 package src.elford.james.please;
 
+import static src.elford.james.please.codegen.JavaLanguage.*;
+
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 
+import src.elford.james.please.codegen.CatchBlock;
+import src.elford.james.please.codegen.Identifier;
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.JavaCodeBlockBuilder;
 import src.elford.james.please.codegen.JavaLanguage;
+import src.elford.james.please.codegen.RawJavaCodeBlock;
+import src.elford.james.please.codegen.TypedJavaCodeBlock;
 
+import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -57,159 +68,110 @@ public class Generate {
 		this.out = out;
 	}
 
-	private void generateIntrospection(ClassName className) {
-		try {
-			String clazz = className.asString();
-			CtClass ctm = cp.get(clazz);
-			CtClass privateAccess = cp
-					.makeInterface(Config.interfaceQualifiedNameFor(clazz));
-			CtClass privateAccessImpl = cp
-					.makeClass(Config.implementationQualifiedNameFor(clazz));
+	private void generateIntrospection(ClassName className) throws NotFoundException, CannotCompileException, IOException {
+		String clazz = className.asString();
+		CtClass ctm = cp.get(clazz);
+		CtClass privateAccess = cp
+				.makeInterface(Config.interfaceQualifiedNameFor(clazz));
+		CtClass privateAccessImpl = cp
+				.makeClass(Config.implementationQualifiedNameFor(clazz));
 
-			CtField wrapped = new CtField(ctm, wrappedMethodField,
-					privateAccessImpl);
-			privateAccessImpl.addField(wrapped);
-			CtConstructor constructor = CtNewConstructor.make(
-					new CtClass[] { ctm }, new CtClass[0], privateAccessImpl);
-			constructor.setBody(wrappedMethodField + " = $1;");
+		CtField wrapped = new CtField(ctm, wrappedMethodField.toString(),
+				privateAccessImpl);
+		privateAccessImpl.addField(wrapped);
+		CtConstructor constructor = CtNewConstructor.make(
+				new CtClass[] { ctm }, new CtClass[0], privateAccessImpl);
+		constructor.setBody(wrappedMethodField + " = $1;");
 
-			privateAccessImpl.addConstructor(constructor);
-			privateAccessImpl.addInterface(privateAccess);
+		privateAccessImpl.addConstructor(constructor);
+		privateAccessImpl.addInterface(privateAccess);
 
-			CtMethod[] ctmMethods = ctm.getDeclaredMethods();
-			for (CtMethod method : ctmMethods) {
-				String name = method.getName();
+		CtMethod[] ctmMethods = ctm.getDeclaredMethods();
+		for (CtMethod method : ctmMethods) {
+			String name = method.getName();
 
-				MethodInfo info = method.getMethodInfo();
-				int accessFlags = info.getAccessFlags();
-				if (AccessFlag.isPrivate(accessFlags)) {
+			MethodInfo info = method.getMethodInfo();
+			int accessFlags = info.getAccessFlags();
+			if (AccessFlag.isPrivate(accessFlags)) {
 
-					// Get return defaults
-					boolean hasReturn = !method.getReturnType().equals(
-							CtClass.voidType);
-					CtClass rType = method.getReturnType();
-					if (rType.isPrimitive() && hasReturn)
-						rType = cp.get(((CtPrimitiveType) rType)
-								.getWrapperName());
+				// Get return defaults
+				boolean hasReturn = !method.getReturnType().equals(
+						CtClass.voidType);
+				CtClass rType = method.getReturnType();
+				if (rType.isPrimitive() && hasReturn)
+					rType = cp.get(((CtPrimitiveType) rType)
+							.getWrapperName());
 
-					// Construct the interface
-					privateAccess.addMethod(CtNewMethod.abstractMethod(rType,
-							name, noPrimitives(cp, method.getParameterTypes()),
-							method.getExceptionTypes(), privateAccess));
+				// Construct the interface
+				privateAccess.addMethod(CtNewMethod.abstractMethod(rType,
+						name, noPrimitives(cp, method.getParameterTypes()),
+						method.getExceptionTypes(), privateAccess));
 
-					StringBuffer mBody = new StringBuffer();
+				JavaCodeBlock mBody = methodBody(
+						_try(
+								set(methodLocalVar).to(introspectMethodWithSignature(method)),
+								setMethodAccessible(),
+								hasReturn ? _return(rType, invokeMethod(method)) : invokeMethod(method)
+						)._catch("Exception", exceptionName).should(reThrowAsError(exceptionName))
+						._finally(doNothing()),
+						_return(null)
+				);
 
-					mBody.append(startFunctionBody);
-					mBody.append(startTryBlock);
 
-					// Method m = ...
-					mBody.append(introspectMethodWithSignature(method));
+				out.println("Wrapping method [" + method.getName() + "] : "
+						+ mBody);
 
-					// Expose the method
-					mBody.append(setMethodAccessible);
+				CtMethod wrappedPrivateMethod = CtNewMethod.make(rType,
+						name, noPrimitives(cp, method.getParameterTypes()),
+						method.getExceptionTypes(), mBody.toString(),
+						privateAccessImpl);
+				
+				out.println("Signature of wrapping method: " + wrappedPrivateMethod.getSignature());
 
-					// Return statement, with appropriate casting
-					if (hasReturn) {
-						mBody.append(returnStatement(rType));
-					}
-
-					// Invoke the method
-					mBody.append(invokeMethod(method));
-
-					// Close the try block and deal with exceptions
-					mBody.append(endTryBlock);
-
-					// A return type (for if there is an exception)
-					if (hasReturn)
-						mBody.append(returnGuard);
-
-					mBody.append(endFunctionBody);
-
-					out.println("Wrapping method [" + method.getName() + "] : "
-							+ mBody);
-
-					CtMethod wrappedPrivateMethod = CtNewMethod.make(rType,
-							name, noPrimitives(cp, method.getParameterTypes()),
-							method.getExceptionTypes(), mBody.toString(),
-							privateAccessImpl);
-
-					privateAccessImpl.addMethod(wrappedPrivateMethod);
-				}
+				privateAccessImpl.addMethod(wrappedPrivateMethod);
+				
 			}
-
-			please.addMethod(CtNewMethod.make(privateAccess, "call",
-					new CtClass[] { ctm }, new CtClass[0], "return new "
-							+ privateAccessImpl.getName() + "($1);", please));
-			pleaseInterface.addMethod(CtNewMethod.abstractMethod(privateAccess,
-					"call", new CtClass[] { ctm }, new CtClass[0],
-					pleaseInterface));
-
-			privateAccess.writeFile(Config.destination);
-			privateAccessImpl.writeFile(Config.destination);
-		} catch (Exception e) {
-			throw new Error(e);
 		}
-	}
 
-	private final String startFunctionBody = "{";
-	private final String startTryBlock = "try {";
+		please.addMethod(CtNewMethod.make(privateAccess, "call",
+				new CtClass[] { ctm }, new CtClass[0], "return new "
+						+ privateAccessImpl.getName() + "($1);", please));
+		pleaseInterface.addMethod(CtNewMethod.abstractMethod(privateAccess,
+				"call", new CtClass[] { ctm }, new CtClass[0],
+				pleaseInterface));
+
+		privateAccess.writeFile(Config.destination);
+		privateAccessImpl.writeFile(Config.destination);
+	}
 
 	// If an error arrises in the introspection, we might as well just throw it;
 	// there's no sensible error handling we could do anyway.
-	private final String endTryBlock = "} catch (Exception e) { throw new Error(e); } ";
+	private JavaCodeBlock reThrowAsError(Identifier e) { return _throw(_new("Error", e.asArgument())); }
 
-	private final String endFunctionBody = "}";
-	private final String setMethodAccessible = "m.setAccessible(true);";
-	private final String methodLocalVar = "m";
-	private final String wrappedMethodField = "wrapped";
-	private final String returnGuard = "return null;";
+	private JavaCodeBlock setMethodAccessible() { return new RawJavaCodeBlock().from("m.setAccessible(true);"); };
+	private final Identifier methodLocalVar = new Identifier("m");
+	private final Identifier wrappedMethodField = new Identifier("wrapped");
+	private final Identifier exceptionName = new Identifier("e");
 
-	private String invokeMethod(CtMethod method) throws NotFoundException {
+	private JavaCodeBlock invokeMethod(CtMethod method) throws NotFoundException {
 		final int numberOfParameters = method.getParameterTypes().length;
-		StringBuilder invocation = new StringBuilder();
+		
+		JavaCodeBlock invocation = methodLocalVar.call("invoke").with(
+									wrappedMethodField.asArgument(), 
+									numberOfParameters > 0 ? 
+											array().ofType("Object").containing(methodArguments(new Range(numberOfParameters))).asArguments()
+											: null
+									);
+		
 
-		invocation.append(methodLocalVar);
-		invocation.append(".invoke(");
-		invocation.append(wrappedMethodField);
-		invocation.append(", ");
-
-		if (numberOfParameters > 0) {
-			invocation.append("new Object[] {");
-
-			for (int i = 0; i < numberOfParameters; ++i) {
-				invocation.append("$" + (Integer.toString(i + 1)) + ", ");
-			}
-
-			if (numberOfParameters > 0)
-				invocation.replace(invocation.length() - 2,
-						invocation.length(), "");
-
-			invocation.append("}");
-		} else {
-			invocation.append("null");
-		}
-
-		invocation.append(");");
-
-		return invocation.toString();
+		return invocation;
 	}
+	
 
-	private String returnStatement(CtClass returnType) throws NotFoundException {
-		StringBuilder rStatement = new StringBuilder();
-		rStatement.append("return ");
-
-		rStatement.append("(");
-		rStatement.append(returnType.getName());
-		rStatement.append(") ");
-
-		return rStatement.toString();
-	}
-
-	private String introspectMethodWithSignature(CtMethod method)
+	private TypedJavaCodeBlock introspectMethodWithSignature(CtMethod method)
 			throws NotFoundException {
 		StringBuilder introspectMethod = new StringBuilder();
-		introspectMethod.append("java.lang.reflect.Method " + methodLocalVar
-				+ " = " + wrappedMethodField
+		introspectMethod.append(wrappedMethodField
 				+ ".getClass().getDeclaredMethod(\"" + method.getName()
 				+ "\", ");
 
@@ -230,7 +192,7 @@ public class Generate {
 		}
 		introspectMethod.append(");");
 
-		return introspectMethod.toString();
+		return new TypedJavaCodeBlock(javaReflectedMethodType, introspectMethod);
 	}
 	
 	/**
