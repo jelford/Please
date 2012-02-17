@@ -1,6 +1,7 @@
 package src.elford.james.please;
 
 import java.io.PrintStream;
+import java.util.List;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -15,8 +16,6 @@ import javassist.bytecode.AccessFlag;
 import javassist.bytecode.MethodInfo;
 
 import com.impetus.annovention.ClasspathDiscoverer;
-import com.impetus.annovention.Discoverer;
-import com.impetus.annovention.listener.ClassAnnotationDiscoveryListener;
 
 public class Generate {
 	public static void main(String[] args) throws Exception {
@@ -25,42 +24,21 @@ public class Generate {
 		CtClass pleaseInterface = cp
 				.makeInterface(Config.pleaseInterfaceClass);
 
-		Discoverer disco = new ClasspathDiscoverer();
 		Generate gen = new Generate(cp, please, pleaseInterface, System.out);
-		disco.addAnnotationListener(new ExposeAnnotationDiscoveryListener(
-				System.out, gen));
-		disco.discover();
+		
+		List<ClassName> classNamesToExpose = 
+				new TargetClassFinder(new ClasspathDiscoverer())
+					.findTargetClassNames();
+		
+		for(ClassName clazz : classNamesToExpose) {
+			gen.generateIntrospection(clazz);
+		}
 
 		please.addInterface(pleaseInterface);
 		please.writeFile(Config.destination);
 		pleaseInterface.writeFile(Config.destination);
 	}
-
-	static class ExposeAnnotationDiscoveryListener implements
-			ClassAnnotationDiscoveryListener {
-
-		private final PrintStream out;
-		private final Generate gen;
-
-		public ExposeAnnotationDiscoveryListener(PrintStream out, Generate gen) {
-			this.out = out;
-			this.gen = gen;
-		}
-
-		@Override
-		public String[] supportedAnnotations() {
-			return new String[] { Expose.class.getName() };
-		}
-
-		@Override
-		public void discovered(String clazz, String annotation) {
-			assert Expose.class.getName().equals(annotation);
-			out.println("Generating interface to expose private methods of "
-					+ clazz);
-			gen.generateIntrospection(clazz);
-		}
-	}
-
+	
 	private final PrintStream out;
 	private final ClassPool cp;
 	private final CtClass please;
@@ -74,9 +52,9 @@ public class Generate {
 		this.out = out;
 	}
 
-	private void generateIntrospection(String clazz) {
+	private void generateIntrospection(ClassName className) {
 		try {
-
+			String clazz = className.asString();
 			CtClass ctm = cp.get(clazz);
 			CtClass privateAccess = cp
 					.makeInterface(Config.interfaceQualifiedNameFor(clazz));
