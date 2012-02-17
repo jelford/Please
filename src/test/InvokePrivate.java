@@ -10,23 +10,22 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import test.candidates.ASecondClass;
 import test.candidates.PrimitiveReturnTypes;
 
 public class InvokePrivate extends TestCase {
 	@Test
-	public void testCanInvokePrivateMethods() {
+	public void testCanInvokePrivateMethods() throws Exception {
 		PrimitiveReturnTypes ctm = new PrimitiveReturnTypes();
 		byte ret = 1;
-		try {
-			Method m = ctm.getClass()
-					.getDeclaredMethod("buyte", new Class[] {});
-			m.setAccessible(true);
-			assertThat((byte) (Byte) m.invoke(ctm, new Object[] {}),
-					is(equalTo(ret)));
+		
+		Method m = ctm.getClass()
+				.getDeclaredMethod("buyte", new Class[] {});
+		m.setAccessible(true);
+		assertThat((byte) (Byte) m.invoke(ctm, new Object[] {}),
+				is(equalTo(ret)));
 
-		} catch (Exception e) {
-			throw new Error(e);
-		}
+		
 
 	}
 }

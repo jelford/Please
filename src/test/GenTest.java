@@ -48,7 +48,10 @@ public class GenTest extends TestCase {
 	
 	@Test
 	public void testCanHandleVoidReturn() {
-		ASecondClass asc = new ASecondClass();
-		please.call(asc).someFunction(asc);
+		ConcreteInvokable i = new ConcreteInvokable();
+		ASecondClass asc = new ASecondClass(i);
+		please.call(asc).someFunction();
+		assertThat(i.hasBeenCalled(), is(true));
+		
 	}
 }
