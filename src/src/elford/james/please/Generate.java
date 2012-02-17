@@ -3,6 +3,8 @@ package src.elford.james.please;
 import java.io.PrintStream;
 import java.util.List;
 
+import src.elford.james.please.codegen.JavaLanguage;
+
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -24,7 +26,8 @@ public class Generate {
 		CtClass pleaseInterface = cp
 				.makeInterface(Config.pleaseInterfaceClass);
 
-		Generate gen = new Generate(cp, please, pleaseInterface, System.out);
+		JavaLanguage language = new JavaLanguage();
+		Generate gen = new Generate(cp, language, please, pleaseInterface, System.out);
 		
 		List<ClassName> classNamesToExpose = 
 				new TargetClassFinder(new ClasspathDiscoverer())
@@ -43,9 +46,11 @@ public class Generate {
 	private final ClassPool cp;
 	private final CtClass please;
 	private final CtClass pleaseInterface;
+	private JavaLanguage java;
 
-	private Generate(ClassPool cp, CtClass please, CtClass pleaseInterface,
+	private Generate(ClassPool cp, JavaLanguage language, CtClass please, CtClass pleaseInterface,
 			PrintStream out) {
+		this.java = language;
 		this.cp = cp;
 		this.please = please;
 		this.pleaseInterface = pleaseInterface;
@@ -79,7 +84,7 @@ public class Generate {
 				int accessFlags = info.getAccessFlags();
 				if (AccessFlag.isPrivate(accessFlags)) {
 
-					// Get return detauls
+					// Get return defaults
 					boolean hasReturn = !method.getReturnType().equals(
 							CtClass.voidType);
 					CtClass rType = method.getReturnType();
@@ -228,6 +233,14 @@ public class Generate {
 		return introspectMethod.toString();
 	}
 	
+	/**
+	 * 
+	 * @param cp
+	 * @param r
+	 * @return The given CtClass[] with all Primitive types substituted for
+	 * reference types.
+	 * @throws NotFoundException
+	 */
 	private CtClass[] noPrimitives(ClassPool cp, CtClass[] r) throws NotFoundException {
 		CtClass[] ret = new CtClass[r.length];
 		for (int i=0; i<r.length; ++i) {
