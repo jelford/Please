@@ -1,18 +1,19 @@
 package src.elford.james.please.codegen;
 
-import src.elford.james.please.codegen.scoped.JavaScopedBlock;
 
+/**
+ * Concrete implementation of a JavaCodeBlock. Provides
+ * convenience methods for manipulating the underlying raw
+ * code.
+ * 
+ * @author james
+ *
+ */
 public class RawJavaCodeBlock implements JavaCodeBlock, JavaCodeBuilder {
 	StringBuilder code;
 
 	@Override
 	public RawJavaCodeBlock append(JavaCodeBlock j) {
-		this.code.append(j);
-		return this;
-	}
-
-	@Override
-	public RawJavaCodeBlock append(JavaScopedBlock j) {
 		this.code.append(j);
 		return this;
 	}
@@ -25,7 +26,7 @@ public class RawJavaCodeBlock implements JavaCodeBlock, JavaCodeBuilder {
 		this.code = new StringBuilder();
 		int i = 0;
 		for (JavaCodeBlock jcb : expressions) {
-			jcb.addTo(this);
+			this.append(jcb);
 			if (++i < expressions.length)
 				this.code.append(";");
 		}
@@ -56,10 +57,6 @@ public class RawJavaCodeBlock implements JavaCodeBlock, JavaCodeBuilder {
 		return this;
 	}
 
-	@Override
-	public void addTo(JavaCodeBuilder jcb) {
-		jcb.append(this);
-	}
 
 
 }

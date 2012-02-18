@@ -15,14 +15,17 @@ import src.elford.james.please.codegen.statements.JavaReturnStatement;
 import src.elford.james.please.codegen.statements.LocalAssignBuilder;
 import src.elford.james.please.codegen.tinytypes.Identifier;
 
+/**
+ * Provides convenience methods for most things you might
+ * want to write. Method bodies, try blocks, ...
+ * 
+ * @author james
+ *
+ */
 public class JavaLanguage {
 	
 	public static JavaCodeBlock methodBody(JavaCodeBlock ... expressions) {
 		return new RawJavaCodeBlock(expressions).prependRaw("{").appendRaw("; }");
-	}
-	
-	public static JavaCodeBlock method(JavaCodeBlock body) {
-		return new RawJavaCodeBlock(body).prependRaw("{").appendRaw("}");
 	}
 	
 	public static TryBlockBuilder _try(JavaCodeBlock jcb) {

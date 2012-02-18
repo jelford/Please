@@ -1,7 +1,6 @@
 package src.elford.james.please.codegen.scoped;
 
 import src.elford.james.please.codegen.JavaCodeBlock;
-import src.elford.james.please.codegen.JavaCodeBuilder;
 import src.elford.james.please.codegen.tinytypes.Identifier;
 
 public class CatchBlockBuilder implements CatchBlock, JavaScopedBlock {
@@ -42,16 +41,6 @@ public class CatchBlockBuilder implements CatchBlock, JavaScopedBlock {
 		return this;
 	}
 
-	@Override
-	public void addTo(JavaCodeBuilder jcb) {
-		jcb.append(this);
-	}
-
-	@Override
-	public JavaScopedBlock append(JavaScopedBlock j) {
-		this.code.append(j);
-		return this;
-	}
 	
 	@Override
 	public String toString() {
