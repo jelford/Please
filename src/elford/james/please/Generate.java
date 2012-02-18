@@ -188,7 +188,7 @@ public class Generate {
 		}
 		introspectMethod.append(");");
 
-		return new TypedJavaCodeBlock(javaReflectedMethodType, introspectMethod);
+		return new TypedJavaCodeBlock(CClassName.from(javaReflectedMethodType), new RawJavaCodeBlock().from(introspectMethod));
 	}
 	
 	/**
