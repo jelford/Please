@@ -3,6 +3,9 @@ package src.elford.james.please;
 import java.io.PrintStream;
 import java.util.List;
 
+import src.elford.james.please.codegen.tinytypes.CClassName;
+import src.elford.james.please.codegen.tinytypes.ClassName;
+
 import com.impetus.annovention.listener.ClassAnnotationDiscoveryListener;
 
 class ExposeAnnotationDiscoveryListener implements

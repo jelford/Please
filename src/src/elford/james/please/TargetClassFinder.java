@@ -3,6 +3,8 @@ package src.elford.james.please;
 import java.util.ArrayList;
 import java.util.List;
 
+import src.elford.james.please.codegen.tinytypes.ClassName;
+
 
 import com.impetus.annovention.ClasspathDiscoverer;
 import com.impetus.annovention.Discoverer;

@@ -1,13 +1,13 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.tinytypes;
+
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.JavaCodeBuilder;
+import src.elford.james.please.codegen.RawJavaCodeBlock;
+import src.elford.james.please.codegen.scoped.JavaScopedBlock;
 
 public class TypedJavaCodeBlock implements JavaCodeBlock {
 	private String type;
 	private JavaCodeBlock wrappedJcb;
-	
-	public TypedJavaCodeBlock(String type, JavaCodeBlock jcb) {
-		this.wrappedJcb = jcb;
-		this.type = type;
-	}
 	
 	public TypedJavaCodeBlock(String type, StringBuilder code) {
 		this.wrappedJcb = new RawJavaCodeBlock().from(code);
@@ -30,7 +30,7 @@ public class TypedJavaCodeBlock implements JavaCodeBlock {
 	}
 
 	@Override
-	public void addTo(JavaCodeBlock jcb) {
+	public void addTo(JavaCodeBuilder jcb) {
 		jcb.append(this);
 	}
 

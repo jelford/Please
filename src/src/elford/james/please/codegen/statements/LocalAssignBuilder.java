@@ -1,4 +1,7 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.statements;
+
+import src.elford.james.please.codegen.tinytypes.Identifier;
+import src.elford.james.please.codegen.tinytypes.TypedJavaCodeBlock;
 
 public class LocalAssignBuilder {
 

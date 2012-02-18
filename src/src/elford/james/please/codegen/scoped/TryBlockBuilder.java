@@ -1,4 +1,8 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.scoped;
+
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.RawJavaCodeBlock;
+import src.elford.james.please.codegen.tinytypes.Identifier;
 
 public class TryBlockBuilder {
 	JavaCodeBlock codeBlock;

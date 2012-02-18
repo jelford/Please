@@ -10,7 +10,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import test.candidates.ASecondClass;
 import test.candidates.PrimitiveReturnTypes;
 
 public class InvokePrivate extends TestCase {

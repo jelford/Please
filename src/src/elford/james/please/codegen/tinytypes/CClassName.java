@@ -1,4 +1,4 @@
-package src.elford.james.please;
+package src.elford.james.please.codegen.tinytypes;
 
 public class CClassName implements ClassName {
 

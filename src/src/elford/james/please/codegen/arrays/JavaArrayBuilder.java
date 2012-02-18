@@ -1,4 +1,7 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.arrays;
+
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.methodcall.MethodInvocationBuilder;
 
 public class JavaArrayBuilder implements JavaArrayTypeBuilder, JavaArrayContentsBuilder, JavaArray {
 
@@ -28,8 +31,8 @@ public class JavaArrayBuilder implements JavaArrayTypeBuilder, JavaArrayContents
 	}
 
 	@Override
-	public JavaCodeBlock asArguments() {
-		return new RawJavaCodeBlock().from(this.code);
+	public String asArgument(MethodInvocationBuilder builder) {
+		return this.code.toString();
 	}
 
 

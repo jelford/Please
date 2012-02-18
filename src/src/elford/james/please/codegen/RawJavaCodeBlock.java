@@ -1,6 +1,8 @@
 package src.elford.james.please.codegen;
 
-public class RawJavaCodeBlock implements JavaCodeBlock {
+import src.elford.james.please.codegen.scoped.JavaScopedBlock;
+
+public class RawJavaCodeBlock implements JavaCodeBlock, JavaCodeBuilder {
 	StringBuilder code;
 
 	@Override
@@ -55,8 +57,9 @@ public class RawJavaCodeBlock implements JavaCodeBlock {
 	}
 
 	@Override
-	public void addTo(JavaCodeBlock jcb) {
+	public void addTo(JavaCodeBuilder jcb) {
 		jcb.append(this);
 	}
+
 
 }

@@ -6,11 +6,23 @@ import java.util.List;
 import javassist.CtClass;
 
 import src.elford.james.please.Range;
+import src.elford.james.please.codegen.arrays.JavaArrayBuilder;
+import src.elford.james.please.codegen.methodcall.EmptyMethodArgument;
+import src.elford.james.please.codegen.methodcall.MethodArgument;
+import src.elford.james.please.codegen.scoped.TryBlockBuilder;
+import src.elford.james.please.codegen.statements.JavaObjectInstantiation;
+import src.elford.james.please.codegen.statements.JavaReturnStatement;
+import src.elford.james.please.codegen.statements.LocalAssignBuilder;
+import src.elford.james.please.codegen.tinytypes.Identifier;
 
 public class JavaLanguage {
 	
 	public static JavaCodeBlock methodBody(JavaCodeBlock ... expressions) {
 		return new RawJavaCodeBlock(expressions).prependRaw("{").appendRaw("; }");
+	}
+	
+	public static JavaCodeBlock method(JavaCodeBlock body) {
+		return new RawJavaCodeBlock(body).prependRaw("{").appendRaw("}");
 	}
 	
 	public static TryBlockBuilder _try(JavaCodeBlock jcb) {
@@ -36,7 +48,7 @@ public class JavaLanguage {
 		
 		List<JavaCodeBlock> argList = new ArrayList<JavaCodeBlock>();
 		for (int i=0; i < numberOfArgs; i++) {
-			argList.add(new RawJavaCodeBlock().from("$"+Integer.toString(i)));
+			argList.add(new RawJavaCodeBlock().from("$"+Integer.toString(i+1)));
 		}
 		args = argList.toArray(args);
 		
@@ -55,7 +67,7 @@ public class JavaLanguage {
 		return new LocalAssignBuilder(i);
 	}
 	
-	public static JavaObjectInstantiation _new(String type, JavaCodeBlock ... arguments) {
+	public static JavaObjectInstantiation _new(String type, MethodArgument ... arguments) {
 		return new JavaObjectInstantiation(type, arguments);
 	}
 	
@@ -65,6 +77,10 @@ public class JavaLanguage {
 	
 	public static JavaCodeBlock doNothing() {
 		return new RawJavaCodeBlock();
+	}
+	
+	public static EmptyMethodArgument noArgument() {
+		return new EmptyMethodArgument();
 	}
 	
 	public final static String javaReflectedMethodType = 

@@ -1,13 +1,12 @@
 package src.elford.james.please.codegen;
 
-public interface JavaCodeBlock {
+
+public interface JavaCodeBlock extends JavaCodeBuilder {
 	
 	@Override
 	public String toString();
 
-	public JavaCodeBlock append(JavaCodeBlock j);
+	public void addTo(JavaCodeBuilder jcb);
 
-	public void addTo(JavaCodeBlock jcb);
-
-	JavaCodeBlock append(JavaScopedBlock j);
+	
 }

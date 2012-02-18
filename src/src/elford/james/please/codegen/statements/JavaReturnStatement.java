@@ -1,5 +1,7 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.statements;
 
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.RawJavaCodeBlock;
 import javassist.CtClass;
 
 public class JavaReturnStatement extends RawJavaCodeBlock implements

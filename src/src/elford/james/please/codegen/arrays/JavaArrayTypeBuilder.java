@@ -1,4 +1,4 @@
-package src.elford.james.please.codegen;
+package src.elford.james.please.codegen.arrays;
 
 public interface JavaArrayTypeBuilder {
 	public JavaArrayContentsBuilder ofType(String type);

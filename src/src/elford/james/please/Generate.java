@@ -1,19 +1,20 @@
 package src.elford.james.please;
 
+import static src.elford.james.please.codegen.JavaLanguage._new;
+import static src.elford.james.please.codegen.JavaLanguage._return;
+import static src.elford.james.please.codegen.JavaLanguage._throw;
+import static src.elford.james.please.codegen.JavaLanguage._try;
+import static src.elford.james.please.codegen.JavaLanguage.array;
+import static src.elford.james.please.codegen.JavaLanguage.doNothing;
+import static src.elford.james.please.codegen.JavaLanguage.javaReflectedMethodType;
+import static src.elford.james.please.codegen.JavaLanguage.methodArguments;
+import static src.elford.james.please.codegen.JavaLanguage.methodBody;
+import static src.elford.james.please.codegen.JavaLanguage.set;
 import static src.elford.james.please.codegen.JavaLanguage.*;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.List;
-
-import src.elford.james.please.codegen.CatchBlock;
-import src.elford.james.please.codegen.Identifier;
-import src.elford.james.please.codegen.JavaCodeBlock;
-import src.elford.james.please.codegen.JavaCodeBlockBuilder;
-import src.elford.james.please.codegen.JavaLanguage;
-import src.elford.james.please.codegen.RawJavaCodeBlock;
-import src.elford.james.please.codegen.TypedJavaCodeBlock;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -27,6 +28,12 @@ import javassist.CtPrimitiveType;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
 import javassist.bytecode.MethodInfo;
+import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.JavaLanguage;
+import src.elford.james.please.codegen.RawJavaCodeBlock;
+import src.elford.james.please.codegen.tinytypes.ClassName;
+import src.elford.james.please.codegen.tinytypes.Identifier;
+import src.elford.james.please.codegen.tinytypes.TypedJavaCodeBlock;
 
 import com.impetus.annovention.ClasspathDiscoverer;
 
@@ -146,7 +153,7 @@ public class Generate {
 
 	// If an error arrises in the introspection, we might as well just throw it;
 	// there's no sensible error handling we could do anyway.
-	private JavaCodeBlock reThrowAsError(Identifier e) { return _throw(_new("Error", e.asArgument())); }
+	private JavaCodeBlock reThrowAsError(Identifier e) { return _throw(_new("Error", e)); }
 
 	private JavaCodeBlock setMethodAccessible() { return new RawJavaCodeBlock().from("m.setAccessible(true);"); };
 	private final Identifier methodLocalVar = new Identifier("m");
@@ -157,9 +164,9 @@ public class Generate {
 		final int numberOfParameters = method.getParameterTypes().length;
 		
 		JavaCodeBlock invocation = methodLocalVar.call("invoke").with(
-									wrappedMethodField.asArgument(), 
+									wrappedMethodField, 
 									numberOfParameters > 0 ? 
-											array().ofType("Object").containing(methodArguments(new Range(numberOfParameters))).asArguments()
+											array().ofType("Object").containing(methodArguments(new Range(numberOfParameters)))
 											: null
 									);
 		
