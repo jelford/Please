@@ -6,11 +6,11 @@ import static src.elford.james.please.codegen.JavaLanguage._throw;
 import static src.elford.james.please.codegen.JavaLanguage._try;
 import static src.elford.james.please.codegen.JavaLanguage.array;
 import static src.elford.james.please.codegen.JavaLanguage.doNothing;
+import static src.elford.james.please.codegen.JavaLanguage.first;
 import static src.elford.james.please.codegen.JavaLanguage.javaReflectedMethodType;
-import static src.elford.james.please.codegen.JavaLanguage.methodArguments;
 import static src.elford.james.please.codegen.JavaLanguage.methodBody;
 import static src.elford.james.please.codegen.JavaLanguage.set;
-import static src.elford.james.please.codegen.JavaLanguage.*;
+import static src.elford.james.please.codegen.JavaLanguage.valuesFrom;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -166,7 +166,7 @@ public class Generate {
 		JavaCodeBlock invocation = methodLocalVar.call("invoke").with(
 									wrappedMethodField, 
 									numberOfParameters > 0 ? 
-											array().ofType("Object").containing(methodArguments(new Range(numberOfParameters)))
+											array().ofType("Object").containing(valuesFrom(first(numberOfParameters).methodArguments()))
 											: null
 									);
 		

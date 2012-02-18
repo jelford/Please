@@ -1,14 +1,12 @@
 package src.elford.james.please.codegen;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import javassist.CtClass;
-
-import src.elford.james.please.Range;
 import src.elford.james.please.codegen.arrays.JavaArrayBuilder;
 import src.elford.james.please.codegen.methodcall.EmptyMethodArgument;
 import src.elford.james.please.codegen.methodcall.MethodArgument;
+import src.elford.james.please.codegen.methodcall.MethodArgumentLookupBuilder;
 import src.elford.james.please.codegen.scoped.TryBlockBuilder;
 import src.elford.james.please.codegen.statements.JavaObjectInstantiation;
 import src.elford.james.please.codegen.statements.JavaReturnStatement;
@@ -45,17 +43,17 @@ public class JavaLanguage {
 		return new JavaArrayBuilder();
 	}
 	
-	public static JavaCodeBlock[] methodArguments(Range numberOfArguments) {
-		int numberOfArgs = numberOfArguments.size();
-		JavaCodeBlock[] args = new JavaCodeBlock[numberOfArgs];
+	public static MethodArgumentLookupBuilder first(int howMany) {
+		return new MethodArgumentLookupBuilder(howMany);
+	}
+	
+	public static JavaCodeBlock[] valuesFrom(MethodArgument[] args) {
 		
-		List<JavaCodeBlock> argList = new ArrayList<JavaCodeBlock>();
-		for (int i=0; i < numberOfArgs; i++) {
-			argList.add(new RawJavaCodeBlock().from("$"+Integer.toString(i+1)));
+		JavaCodeBlock[] jcbArray = new JavaCodeBlock[args.length];
+		for (int i = 0; i < args.length; i++) {
+			jcbArray[i] = new RawJavaCodeBlock().from(args[i].toString());
 		}
-		args = argList.toArray(args);
-		
-		return args;
+		return jcbArray;
 	}
 	
 	public static JavaReturnStatement _return(CtClass type, JavaCodeBlock expression) {
