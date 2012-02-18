@@ -3,6 +3,7 @@ package test.candidates;
 import src.elford.james.please.Expose;
 
 @Expose
+@SuppressWarnings("unused")
 public class PrimitiveReturnTypes {
 	
 	private byte buyte() {

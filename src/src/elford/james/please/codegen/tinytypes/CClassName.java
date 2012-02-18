@@ -9,8 +9,12 @@ public class CClassName implements ClassName {
 	}
 	
 	@Override
-	public String asString() {
+	public String toString() {
 		return wrappedString;
+	}
+	
+	public static ClassName from(String string) {
+		return new CClassName(string);
 	}
 
 }

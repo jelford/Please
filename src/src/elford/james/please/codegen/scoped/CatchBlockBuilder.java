@@ -1,11 +1,12 @@
 package src.elford.james.please.codegen.scoped;
 
 import src.elford.james.please.codegen.JavaCodeBlock;
+import src.elford.james.please.codegen.tinytypes.ClassName;
 import src.elford.james.please.codegen.tinytypes.Identifier;
 
 public class CatchBlockBuilder implements CatchBlock, JavaScopedBlock {
 	
-	String type;
+	ClassName type;
 	
 	StringBuilder code;
 
@@ -13,7 +14,7 @@ public class CatchBlockBuilder implements CatchBlock, JavaScopedBlock {
 
 	private Identifier exceptionLabel;
 	
-	CatchBlockBuilder(TryBlockBuilder tryBlockBuilder, String exceptionType, Identifier label) {
+	CatchBlockBuilder(TryBlockBuilder tryBlockBuilder, ClassName exceptionType, Identifier label) {
 		this.tryCode = tryBlockBuilder;
 		this.type = exceptionType;
 		this.exceptionLabel = label;

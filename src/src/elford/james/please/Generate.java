@@ -31,6 +31,7 @@ import javassist.bytecode.MethodInfo;
 import src.elford.james.please.codegen.JavaCodeBlock;
 import src.elford.james.please.codegen.JavaLanguage;
 import src.elford.james.please.codegen.RawJavaCodeBlock;
+import src.elford.james.please.codegen.tinytypes.CClassName;
 import src.elford.james.please.codegen.tinytypes.ClassName;
 import src.elford.james.please.codegen.tinytypes.Identifier;
 import src.elford.james.please.codegen.tinytypes.TypedJavaCodeBlock;
@@ -64,11 +65,9 @@ public class Generate {
 	private final ClassPool cp;
 	private final CtClass please;
 	private final CtClass pleaseInterface;
-	private JavaLanguage java;
 
 	private Generate(ClassPool cp, JavaLanguage language, CtClass please, CtClass pleaseInterface,
 			PrintStream out) {
-		this.java = language;
 		this.cp = cp;
 		this.please = please;
 		this.pleaseInterface = pleaseInterface;
@@ -76,7 +75,7 @@ public class Generate {
 	}
 
 	private void generateIntrospection(ClassName className) throws NotFoundException, CannotCompileException, IOException {
-		String clazz = className.asString();
+		String clazz = className.toString();
 		CtClass ctm = cp.get(clazz);
 		CtClass privateAccess = cp
 				.makeInterface(Config.interfaceQualifiedNameFor(clazz));
@@ -119,7 +118,7 @@ public class Generate {
 								set(methodLocalVar).to(introspectMethodWithSignature(method)),
 								setMethodAccessible(),
 								hasReturn ? _return(rType, invokeMethod(method)) : invokeMethod(method)
-						)._catch("Exception", exceptionName).should(reThrowAsError(exceptionName))
+						)._catch(CClassName.from("Exception"), exceptionName).should(reThrowAsError(exceptionName))
 						._finally(doNothing()),
 						_return(null)
 				);
