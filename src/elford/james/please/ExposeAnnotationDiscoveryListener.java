@@ -3,11 +3,10 @@ package elford.james.please;
 import java.io.PrintStream;
 import java.util.List;
 
-
 import com.impetus.annovention.listener.ClassAnnotationDiscoveryListener;
 
-import elford.james.please.codegen.tinytypes.CClassName;
-import elford.james.please.codegen.tinytypes.ClassName;
+import elford.james.codegen.tinytypes.CClassName;
+import elford.james.codegen.tinytypes.ClassName;
 
 class ExposeAnnotationDiscoveryListener implements
 		ClassAnnotationDiscoveryListener {

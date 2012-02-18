@@ -1,17 +1,5 @@
 package elford.james.please;
 
-import static elford.james.please.codegen.JavaLanguage._new;
-import static elford.james.please.codegen.JavaLanguage._return;
-import static elford.james.please.codegen.JavaLanguage._throw;
-import static elford.james.please.codegen.JavaLanguage._try;
-import static elford.james.please.codegen.JavaLanguage.array;
-import static elford.james.please.codegen.JavaLanguage.doNothing;
-import static elford.james.please.codegen.JavaLanguage.first;
-import static elford.james.please.codegen.JavaLanguage.javaReflectedMethodType;
-import static elford.james.please.codegen.JavaLanguage.methodBody;
-import static elford.james.please.codegen.JavaLanguage.set;
-import static elford.james.please.codegen.JavaLanguage.valuesFrom;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
@@ -31,13 +19,14 @@ import javassist.bytecode.MethodInfo;
 
 import com.impetus.annovention.ClasspathDiscoverer;
 
-import elford.james.please.codegen.JavaCodeBlock;
-import elford.james.please.codegen.JavaLanguage;
-import elford.james.please.codegen.RawJavaCodeBlock;
-import elford.james.please.codegen.tinytypes.CClassName;
-import elford.james.please.codegen.tinytypes.ClassName;
-import elford.james.please.codegen.tinytypes.Identifier;
-import elford.james.please.codegen.tinytypes.TypedJavaCodeBlock;
+import elford.james.codegen.JavaCodeBlock;
+import elford.james.codegen.JavaLanguage;
+import elford.james.codegen.RawJavaCodeBlock;
+import elford.james.codegen.tinytypes.CClassName;
+import elford.james.codegen.tinytypes.ClassName;
+import elford.james.codegen.tinytypes.Identifier;
+import elford.james.codegen.tinytypes.TypedJavaCodeBlock;
+import static elford.james.codegen.JavaLanguage.*;
 
 public class Generate {
 	public static void main(String[] args) throws Exception {
@@ -118,7 +107,7 @@ public class Generate {
 						_try(
 								set(methodLocalVar).to(introspectMethodWithSignature(method)),
 								setMethodAccessible(),
-								hasReturn ? _return(rType, invokeMethod(method)) : invokeMethod(method)
+								hasReturn ? _return(CClassName.from(rType.getName()), invokeMethod(method)) : invokeMethod(method)
 						)._catch(CClassName.from("Exception"), exceptionName).should(reThrowAsError(exceptionName))
 						._finally(doNothing()),
 						_return(null)

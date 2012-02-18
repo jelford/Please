@@ -3,12 +3,10 @@ package elford.james.please;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 import com.impetus.annovention.ClasspathDiscoverer;
 import com.impetus.annovention.Discoverer;
 
-import elford.james.please.codegen.tinytypes.ClassName;
+import elford.james.codegen.tinytypes.ClassName;
 
 class TargetClassFinder implements
 		ITargetClassFinder {
