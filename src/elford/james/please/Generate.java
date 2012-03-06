@@ -19,13 +19,13 @@ import javassist.bytecode.MethodInfo;
 
 import com.impetus.annovention.ClasspathDiscoverer;
 
-import elford.james.codegen.JavaCodeBlock;
 import elford.james.codegen.JavaLanguage;
-import elford.james.codegen.RawJavaCodeBlock;
+import elford.james.codegen.TerminatingJavaCodeBlock;
+import elford.james.codegen.UnterminatedJavacodeBlock;
 import elford.james.codegen.tinytypes.CClassName;
 import elford.james.codegen.tinytypes.ClassName;
 import elford.james.codegen.tinytypes.Identifier;
-import elford.james.codegen.tinytypes.TypedJavaCodeBlock;
+import elford.james.codegen.tinytypes.MethodInvokation;
 import static elford.james.codegen.JavaLanguage.*;
 
 public class Generate {
@@ -103,28 +103,35 @@ public class Generate {
 						name, noPrimitives(cp, method.getParameterTypes()),
 						method.getExceptionTypes(), privateAccess));
 
-				JavaCodeBlock mBody = methodBody(
+				TerminatingJavaCodeBlock mBody = methodBody(
+						declare(methodLocalVar).as(CClassName.from(javaReflectedMethodType)),
 						_try(
 								set(methodLocalVar).to(introspectMethodWithSignature(method)),
 								setMethodAccessible(),
-								hasReturn ? _return(CClassName.from(rType.getName()), invokeMethod(method)) : invokeMethod(method)
-						)._catch(CClassName.from("Exception"), exceptionName).should(reThrowAsError(exceptionName))
+								hasReturn ? _return(cast(invokeMethod(method)).as(CClassName.from(rType.getName()))) : invokeMethod(method)
+						)._catch(CClassName.from("Exception"), exceptionName).then(reThrowAsError(exceptionName))
 						._finally(doNothing()),
-						_return(null)
+						_return(literal(null))
 				);
-
 
 				out.println("Wrapping method [" + method.getName() + "] : "
 						+ mBody);
 
-				CtMethod wrappedPrivateMethod = CtNewMethod.make(rType,
-						name, noPrimitives(cp, method.getParameterTypes()),
-						method.getExceptionTypes(), mBody.toString(),
-						privateAccessImpl);
-				
-				out.println("Signature of wrapping method: " + wrappedPrivateMethod.getSignature());
+				try {
+					CtMethod wrappedPrivateMethod = CtNewMethod.make(rType,
+							name, noPrimitives(cp, method.getParameterTypes()),
+							method.getExceptionTypes(), mBody.representTerminating(),
+							privateAccessImpl);
+					
+					out.println("Signature of wrapping method: " + wrappedPrivateMethod.getSignature());
 
-				privateAccessImpl.addMethod(wrappedPrivateMethod);
+					privateAccessImpl.addMethod(wrappedPrivateMethod);
+					
+				} catch (javassist.CannotCompileException e) {
+					out.println("Wrapping failed! Method body was:");
+					out.println(mBody.representTerminating());
+					throw e;
+				}
 				
 			}
 		}
@@ -142,21 +149,23 @@ public class Generate {
 
 	// If an error arrises in the introspection, we might as well just throw it;
 	// there's no sensible error handling we could do anyway.
-	private JavaCodeBlock reThrowAsError(Identifier e) { return _throw(_new("Error", e)); }
+	private TerminatingJavaCodeBlock reThrowAsError(Identifier e) { return _throw(CClassName.from("Error"), e); }
 
-	private JavaCodeBlock setMethodAccessible() { return new RawJavaCodeBlock().from("m.setAccessible(true);"); };
+	private TerminatingJavaCodeBlock setMethodAccessible() { 
+		return methodLocalVar.call("setAccessible").withArguments(literal(true));
+	}
 	private final Identifier methodLocalVar = new Identifier("m");
 	private final Identifier wrappedMethodField = new Identifier("wrapped");
 	private final Identifier exceptionName = new Identifier("e");
 
-	private JavaCodeBlock invokeMethod(CtMethod method) throws NotFoundException {
+	private TerminatingJavaCodeBlock invokeMethod(CtMethod method) throws NotFoundException {
 		final int numberOfParameters = method.getParameterTypes().length;
-		
-		JavaCodeBlock invocation = methodLocalVar.call("invoke").with(
-									wrappedMethodField, 
+		MethodInvokation invocation = methodLocalVar.call("invoke").withArguments(
+									wrappedMethodField,
 									numberOfParameters > 0 ? 
-											array().ofType("Object").containing(valuesFrom(first(numberOfParameters).methodArguments()))
-											: null
+											array().ofType(CClassName.from("Object"))
+											.containing(methodArguments(from(1).to(numberOfParameters+1)))
+									: literal(null)
 									);
 		
 
@@ -164,7 +173,7 @@ public class Generate {
 	}
 	
 
-	private TypedJavaCodeBlock introspectMethodWithSignature(CtMethod method)
+	private UnterminatedJavacodeBlock introspectMethodWithSignature(CtMethod method)
 			throws NotFoundException {
 		StringBuilder introspectMethod = new StringBuilder();
 		introspectMethod.append(wrappedMethodField
@@ -186,9 +195,16 @@ public class Generate {
 		} else {
 			introspectMethod.append("null");
 		}
-		introspectMethod.append(");");
-
-		return new TypedJavaCodeBlock(CClassName.from(javaReflectedMethodType), new RawJavaCodeBlock().from(introspectMethod));
+		introspectMethod.append(")");
+		
+		final String returnedString = introspectMethod.toString();
+		return new UnterminatedJavacodeBlock() {
+			
+			@Override
+			public String representUnterminating() {
+				return returnedString;
+			}
+		};
 	}
 	
 	/**
